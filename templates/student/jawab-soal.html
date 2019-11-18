@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+
+{% block title %} Detail Paket {% endblock %}
+
+{% block body %}
+<div class="container">
+    <ul class="breadcrumb">
+        <li><a href="/home">Home</a></li>
+        <li><a href="/student/simulasi">List Simulasi</a></li>
+        <li><a href="/student/simulasi/pilih-paket/{{ simulasi.id }}">Paket</a></li>
+        <li>Pertanyaan</li>
+    </ul>
+    <div class="starter-template">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>{{ simulasi.nama_simulasi }}</h3>
+                <h4>{{ paket.nama_paket }}</h4>
+            </div>
+            <div class="col-md-4" align="right">
+                <a href="/student/selesai-simulasi/{{ riwayat.id }}" onclick="return confirm('Yakin ingin selesai simulasi?')" class="btn btn-primary">Selesai Simulasi</a>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <form action="/student/mulai-simulasi/simpan-jawaban" method="POST">
+                    <div class="panel-heading">
+                        {{ soal.nama_tipe }}
+                    </div>
+                    <div class="panel-body">
+                        <b>No. {{ nomor }} </b>
+                        <p>{{ soal.pertanyaan_text }}</p>
+                        <ol type="A" id="opsi{{ soal.id }}"></ol>
+                    </div>
+                    <div class="panel-footer">
+                        <input type="hidden" name="id_simulasi_paket" value="{{ idSimPaket }}">
+                        <input type="hidden" name="id_paket" value="{{ paket.id }}">
+                        <input type="hidden" name="id_riwayat" value="{{ riwayat.id }}">
+                        <input type="hidden" name="id_tipe" value="{{ soal.id_tipe }}">
+                        <input type="hidden" name="id_soal" value="{{ soal.id }}">
+                        <input type="hidden" name="nomor" value="{{ nomor }}">
+                        <input type="hidden" name="total" value="{{ totalSoal.total }}">
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </div>
+                </form>
+            </div>
+            <nav aria-label="Page navigation" align="center">
+                <ul class="pagination">
+                    {%for i in range(0, totalSoal.total)%}
+                    <li {% if i+1 == nomor %} class="active" {% endif %}>
+                        <a href='/student/mulai-simulasi/{{ riwayat.id }}/{{ simulasi.id }}/paket/{{ paket.id }}/pertanyaan/{{ i+1 }}'>{{ i+1 }}</a>
+                    </li>
+                    {%endfor%}
+                </ul>
+            </nav>
+            <script>
+                var id = "{{ soal.id }}";
+                var id_jawaban_opsi = "{% if cek_jawaban %}{{ cek_jawaban.id_opsi_jawab }}{% endif %}";
+                $.ajax({
+                        url: window.location.origin + '/ajax/soal/opsi' + '/' + id,
+                        type: 'GET',
+                        dataType: 'json',
+                        error: function (err) {
+                            console.log(err);
+                            $("#opsi{{ soal.id }}").html("<tr><td>Tidak dapat diproses</td><tr>");
+                        },
+                        success: function (data) {
+                            if (data.length > 0) {
+                                $("#opsi{{ soal.id }}").html("");
+                                $("#loadOpsi{{ soal.id }}").html("");
+                                for (let index = 0; index < data.length; index++) {
+                                    var isChecked = "";
+                                    if (id_jawaban_opsi == data[index].id) {
+                                        isChecked = "checked";
+                                    }
+                                    $("#opsi{{ soal.id }}").append("<li> <input type='radio' name='jawaban' "+ isChecked +" value='"+ data[index].id+"'>"+data[index].opsi_text +"</li>");
+                                }
+                            } else {
+                                $("#loadOpsi{{ soal.id }}").html("");
+                                $("#opsi{{ soal.id }}").html("");
+                            }
+                        }
+                    });
+            </script>
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+{% endblock %}
+
+{% block js %}
+<script>
+    function getOpsiSoal(id) {
+        
+    }
+</script>
+{% endblock %}

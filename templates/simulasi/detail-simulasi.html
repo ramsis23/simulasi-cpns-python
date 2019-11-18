@@ -1,0 +1,173 @@
+{% extends 'layout.html' %}
+
+{% block title %} Detail Simulasi {% endblock %}
+
+{% block body %}
+<div class="container">
+    <ul class="breadcrumb">
+        <li><a href="/home">Home</a></li>
+        <li><a href="/data-simulasi">Data Simulasi</a></li>
+        <li class="active">Detail</li>
+    </ul>
+    <div class="starter-template">
+        <h1>Detail Simulasi</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table">
+                <tr>
+                    <td style="width:150px;">Nama Simulasi</td>
+                    <th>{{ simulasi.nama_simulasi }}</th>
+                </tr>
+                <tr>
+                    <td style="width:150px;">Durasi</td>
+                    <th>{{ simulasi.durasi }} menit</th>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        {{ simulasi.panduan }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-md-12">
+            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#myModal">Tambah Paket Ke Simulasi</button>
+            <!-- Modal -->
+            <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+            
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Tambah Paket Ke Simulasi</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="usr">Cari Nama Paket:</label>
+                                <input type="text" class="form-control" id="keyword" placeholder="nama paket">
+                            </div>
+                            <div>
+                                <table class="table">
+                                    <tbody id="resultSearchPaket">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <form>
+                                
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+            
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama Paket</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in paket %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td><a href="/data-paket/{{ row.id_paket }}">{{ row.nama_paket }}</a></td>
+                        <td>
+                            <a href="/data-paket/{{ row.id_paket }}" class="btn btn-xs btn-success">Detail</a>
+                            <a href="/data-simulasi/paket/del/{{ row.id_simulasi }}/{{ row.id }}" onclick="return confirm('Yakin ingin dihapus?')" class="btn btn-xs btn-danger">Hapus</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+{% endblock %}
+
+{% block js %}
+<script>
+
+    $("#keyword").keyup(function (event) {
+        var val = $(this).val();
+        if(val != '')
+            searchPaket(val);
+        else
+            $("#resultSearchPaket").html("");
+    });
+    
+    function searchPaket(val) {
+        console.log(val);
+        $.ajax({
+            url: window.location.origin+'/ajax/paket/search'+'/'+val,
+            type: 'GET',
+            dataType: 'json',
+            error: function (err) {
+                console.log(err);
+                $("#resultSearchPaket").html("<tr><td>Tidak dapat diproses</td><tr>");
+            },
+            success: function (data) {
+                console.log(data);
+                if(data.length > 0){
+                    $("#resultSearchPaket").html("");
+                    for (let index = 0; index < data.length; index++) {
+                        $("#resultSearchPaket").append("<tr><td>" + data[index].nama_paket + "</td><td><button onclick='addPaket("+ data[index].id+")' class='btn btn-xs btn-success'>Add</button></td><tr>");
+                    }
+                }else{
+                    $("#resultSearchPaket").html("");
+                }
+            }
+        });
+    }
+
+    function addPaket(id){
+        console.log("add paket");
+        $.ajax({
+            url: window.location.origin +'/ajax/paket-simulasi/add',
+            type: 'POST',
+            data: {
+                id_simulasi: '{{ simulasi.id }}',
+                id_paket: id
+            },
+            dataType: 'json',
+            error: function (err) {
+                alert("ERROR!!!");
+                console.log(err);
+            },
+            success: function (data) {
+                console.log(data);
+                alert("Berhasil Ditambahkan");
+                location.reload();
+            }
+        });
+    }
+
+    function loadPaket(){
+        $.ajax({
+            url: 'http://api.joind.in/v2.1/talks/10889',
+            type: 'GET',
+            data: {
+                format: 'json'
+            },
+            dataType: 'json',
+            error: function () {
+                $('#info').html('<p>An error has occurred</p>');
+            },
+            success: function (data) {
+                console.log(data);
+            }
+        });
+    }
+</script>
+{% endblock %}

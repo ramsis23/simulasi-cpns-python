@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block title %} Data Simulasi {% endblock %}
+
+{% block body %}
+<div class="container">
+    <ul class="breadcrumb">
+        <li><a href="/home">Home</a></li>
+        <li>Hasil Simulasi</li>
+    </ul>
+
+    <div class="starter-template">
+        <h1>Hasil Simulasi</h1>
+        <h2>{{ hasil.nama_simulasi }}</h2>
+        <h3>{{ hasil.nama_paket }}</h3>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nama Paket</th>
+                        <th>Poin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in tipesoal %}
+                    <tr>
+                        <td>{{ row.nama_tipe}}</td>
+                        <td>{{ row.tspoin }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <th style="text-align:right">TOTAL</th>
+                        <th>{{ hasil.nilai }}</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block title %} Data Simulasi {% endblock %}
+
+{% block body %}
+<div class="container">
+    <ul class="breadcrumb">
+        <li><a href="/home">Home</a></li>
+        <li>List Simulasi</li>
+    </ul>
+
+    <div class="starter-template">
+        <h1>List Simulasi</h1>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>ID</td>
+                        <td>Nama Simulasi</td>
+                        <td>Durasi</td>
+                        <td>Aksi</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in simulasis %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td>{{ row.nama_simulasi }}</td>
+                        <td>{{ row.durasi }} menit</td>
+                        <td>
+                            <a href="/student/simulasi/pilih-paket/{{ row.id }}" class="btn btn-xs btn-success">Mulai</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+{% endblock %}

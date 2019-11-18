@@ -1,0 +1,106 @@
+{% extends 'layout.html' %}
+
+{% block title %} Data Paket {% endblock %}
+
+{% block body %}
+<div class="container">
+    <ul class="breadcrumb">
+        <li><a href="/home">Home</a></li>
+        <li>Data Paket</li>
+    </ul>
+    <div class="starter-template">
+        <h1>Data Paket</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p align="center">
+                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal">Tambah Paket</button>
+            </p>
+            <!-- Modal -->
+            <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+            
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Tambah Paket</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/data-paket/add">
+                                <div class="form-group">
+                                    <label for="usr">Nama Paket:</label>
+                                    <input type="text" class="form-control" name="nama_paket">
+                                </div>
+                                <p>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </p>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>ID</td>
+                        <td>Nama</td>
+                        <td>Aksi</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in pakets %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td>{{ row.nama_paket }}</td>
+                        <td>
+                            <a href="/data-paket/{{ row.id }}" class="btn btn-xs btn-success">Detail</a>
+                            <button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#myModalEdit{{ row.id }}">Edit</button>
+                            <a href="/data-paket/delete/{{ row.id }}" class="btn btn-xs btn-danger" onclick="return confirm('Yakin ingin hapus?')">Hapus</a>
+                        </td>
+                    </tr>
+
+                    <div id="myModalEdit{{ row.id }}" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                    
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Tambah Paket</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="POST" action="/data-paket/update">
+                                        <div class="form-group">
+                                            <label for="usr">Nama Paket:</label>
+                                            <input type="hidden" name="id" value="{{ row.id }}">
+                                            <input type="text" class="form-control" name="nama_paket" value="{{ row.nama_paket }}">
+                                        </div>
+                                        <p>
+                                            <button type="submit" class="btn btn-warning">Update</button>
+                                        </p>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                    
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+{% endblock %}

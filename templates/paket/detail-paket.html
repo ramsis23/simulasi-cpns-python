@@ -1,0 +1,217 @@
+{% extends 'layout.html' %}
+
+{% block title %} Detail Paket {% endblock %}
+
+{% block body %}
+<div class="container">
+    <ul class="breadcrumb">
+        <li><a href="/home">Home</a></li>
+        <li><a href="/data-paket">Data Paket</a></li>
+        <li class="active">Detail</li>
+    </ul>
+    <div class="starter-template">
+        <h3>{{ paket.nama_paket }}</h3>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#myModal">Tambah Soal</button>
+            <!-- Modal -->
+            <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Tambah Soal</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/data-paket/soal/add" method="POST">
+                                <input type="hidden" name="id_paket" value="{{ paket.id }}">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group col">
+                                            <label for="sel1">Tipe Soal:</label>
+                                            <select class="form-control" name="id_tipe">
+                                                {% for row in tipe %}
+                                                <option value="{{ row.id }}">{{ row.nama_tipe }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="form-group col">
+                                            <label for="usr">Nomor Soal:</label>
+                                            <input type="number" class="form-control" name="nomor_soal"
+                                                value="{{ total+1 }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="comment">Pertanyaan:</label>
+                                    <textarea class="form-control" rows="5" name="pertanyaan_text"></textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <label for="comment">Opsi:</label>
+                                        <textarea class="form-control" rows="2" name="opsi_text1"></textarea>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="comment">Poin:</label>
+                                        <input type="number" class="form-control" name="poin1" value="0">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" rows="2" name="opsi_text2"></textarea>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control" name="poin2" value="0">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" rows="2" name="opsi_text3"></textarea>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control" name="poin3" value="0">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" rows="2" name="opsi_text4"></textarea>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control" name="poin4" value="0">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" rows="2" name="opsi_text5"></textarea>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control" name="poin5" value="0">
+                                    </div>
+                                </div>
+                                <br>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div style="clear: both;height: 15px"></div>
+        <div class="col-md-12">
+            {% for row in soals %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {{ row.nama_tipe }}
+                </div>
+                <div class="panel-body">
+                    <b>No. {{ row.nomor_soal }} </b>
+                    <p>{{ row.pertanyaan_text }}</p>
+                    <ol type="A" id="opsi{{ row.id }}"></ol>
+                </div>
+                <div class="panel-footer">
+                    <a href="" class="btn btn-xs btn-warning" data-toggle="modal"
+                        data-target="#myModalSoalEdit{{ row.id }}">Edit</a> &nbsp;&nbsp; <a
+                        href="/data-paket/soal/del/{{ paket.id }}/{{ row.id }}"
+                        onclick="return confirm('Yakin ingin hapus soal ini?')" class="btn btn-xs btn-danger">Hapus</a>
+                </div>
+
+                <!-- Modal -->
+                <div id="myModalSoalEdit{{ row.id }}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Edit Soal</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="/data-paket/soal/update">
+                                    <input type="hidden" name="id_paket" value="{{ paket.id }}">
+                                    <input type="hidden" name="id_soal" value="{{ row.id }}">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group col">
+                                                <label for="sel1">Tipe Soal:</label>
+                                                <select class="form-control" name="id_tipe">
+                                                    {% for tp in tipe %}
+                                                    <option value="{{ tp.id }}" {% if(row.id_tipe == tp.id) %} selected
+                                                        {% endif %}>{{ tp.nama_tipe }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="form-group col">
+                                                <label for="usr">Nomor Soal:</label>
+                                                <input type="number" class="form-control" name="nomor_soal"
+                                                    value="{{ row.nomor_soal }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="comment">Pertanyaan:</label>
+                                        <textarea class="form-control" rows="5"
+                                            name="pertanyaan_text">{{ row.pertanyaan_text }}</textarea>
+                                    </div>
+                                    <div id="loadOpsi{{ row.id }}">
+
+                                    </div>
+                                    <br>
+                                    <button class="btn btn-warning">Update</button>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <script>
+                var id = "{{ row.id }}";
+                $.ajax({
+                    url: window.location.origin + '/ajax/soal/opsi' + '/' + id,
+                    type: 'GET',
+                    dataType: 'json',
+                    error: function (err) {
+                        console.log(err);
+                        $("#opsi{{ row.id }}").html("<tr><td>Tidak dapat diproses</td><tr>");
+                    },
+                    success: function (data) {
+                        if (data.length > 0) {
+                            $("#opsi{{ row.id }}").html("");
+                            $("#loadOpsi{{ row.id }}").html("");
+                            for (let index = 0; index < data.length; index++) {
+                                $("#opsi{{ row.id }}").append("<li>" + data[index].opsi_text + "&nbsp;&nbsp;&nbsp;<i>(poin: " + data[index].poin + ")</i>" + "</li>");
+                                $("#loadOpsi{{ row.id }}").append("<div class='row'><div class='col-md-10'><input type='hidden' name='id_opsi" + (index + 1) + "' value='" + data[index].id + "'>" +
+                                    "<input type='text' name='opsi_text" + (index + 1) + "' value='" + data[index].opsi_text + "' class='form-control'></div><div class='col-md-2'><input type='number' name='poin" + (index + 1) + "' value='" + data[index].poin + "' class='form-control'></div></div>");
+                            }
+                        } else {
+                            $("#loadOpsi{{ row.id }}").html("");
+                            $("#opsi{{ row.id }}").html("");
+                        }
+                    }
+                });
+            </script>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+{% endblock %}
+
+{% block js %}
+<script>
+    function getOpsiSoal(id) {
+
+    }
+</script>
+{% endblock %}

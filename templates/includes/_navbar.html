@@ -1,0 +1,60 @@
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Simulasi CPNS</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                {% if session['name'] %}
+                    {% if session['role'] == 'admin' %}
+                        <li>
+                            <a href="/data-tipe">Tipe Soal</a>
+                        </li>
+                        <li>
+                            <a href="/data-paket">Paket</a>
+                        </li>
+                        <li>
+                            <a href="/data-simulasi">Simulasi</a>
+                    {% else %}
+                        <li>
+                            <a href="/student/simulasi">Simulasi</a>
+                        </li>
+                        <li>
+                            <a href="/student/riwayat">Riwayat</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if session['name'] %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">{{ session['name'] }} <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Profil</a></li>
+                            <li><a href="/logout" onclick="return confirm('Yakin ingin logout?')">Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="/login">Login</a>
+                    </li>
+                    <li>
+                        <a href="/register">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
