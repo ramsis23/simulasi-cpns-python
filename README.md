@@ -3,6 +3,7 @@
 <head>
 </head>
 <body>
+<h1 style="text-align: center;">MEMBUAT APLIKASI SIMULASI CPNS MENGGUNAKAN PYTHON, FLASK &amp; MySQL</h1>
 <h1>Tahapan Persiapan</h1>
 <ul>
 <li>install python</li>
