@@ -11,7 +11,7 @@
 
 # Desain Database
 ![N|Solid](https://i.postimg.cc/DZrmbL6q/relasi-tabel-simulasi-tes-cpns.png)
-Contoh kode program untuk megenerate tabel:
+Contoh kode program untuk men-generate tabel:
 ```python
 cursor = connection.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS users
@@ -96,7 +96,7 @@ Aplikasi sederhana ini memungkinkan pengguna untuk menambah simulasi, tipe, pake
 
 Sebelum membuat akun, lakukan pengecekan terlebih dahulu untuk mengetahui apakah email yang akan digunakan oleh pengguna tersedia (belum pernah digunakan). Jika belum digunakan maka lakukan penambahan pengguna baru dengan role sebagai admin
 
-Contoh kode program:)
+Contoh kode program
 ```python
 
     # Cek apakah user dengan email tersebut sudah ada
@@ -291,6 +291,13 @@ def updatePaket():
 ```
 
 # Menghapus Data
+Mengapus data adalah aksi yang beresiko tinggi karena data yang telah dihapus tidak dapat dikembalikan oleh karena itu diperlukan konfirmasi ulang apakah benar pengguna ingin menhapus data tersebut. Untuk melakukan konfirmasi ke user cukup mudah menggunakan salah satu fungsi dari javascript yaitu fungsi confirm(). Fungsi confirm() diletakkan pada link hapus.
+
+Contoh penggunakan fungsi confirm()
+```html
+<a href="/data-paket/delete/{{ row.id }}" class="btn btn-xs btn-danger" onclick="return confirm('Yakin ingin hapus?')">Hapus</a>
+```
+
 Contoh route untuk menghapus data paket soal
 ```python
 @app.route('/data-paket/delete/<string:id>')
