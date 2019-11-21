@@ -1,5 +1,15 @@
 # MEMBUAT APLIKASI SIMULASI CPNS SEDERHANA MENGGUNAKAN PYTHON, FLASK & MySQL
 
+Aplikasi ini dibuat mengikuti salah satu situs simulasi ujian yaitu <a href="https://harithfoundation.id">Harith Foundation</a>
+![N|Solid](https://i.postimg.cc/NG2dfKff/harith.png)
+
+Aplikasi tersebut memiliki fitur-fitur diantaranya:
+- Pembuatan Simulasi Ujian
+- Pembuatan Paket-paket untuk Simulasi
+- Pembuatan Soal dengan jenis soal
+- Melakukan Simulasi (menjawab soal)
+- Menampilkan hasil simulasi
+
 # Tahap Persiapan
 - install python
 - install text editor ([Notepad++](https://notepad-plus-plus.org/downloads/v7.8.1/) atau [Visual Studio Code](https://code.visualstudio.com/download) atau text editor lainnya)
@@ -209,7 +219,7 @@ def register():
             # Dapatkan pengguna dari email
             cursor = connection.cursor()
             cursor.execute(
-                "SELECT count(email) as total FROM users WHERE email=%s", [email])
+                "SELECT * FROM users WHERE email=%s", [email])
             user = cursor.fetchone()
             cursor.close()
 
@@ -337,7 +347,7 @@ def deletePaket(id):
 
 Semua soal yang masuk dalam kategori paket tersebut juga akan dihapus
 
-# Menajawab Soal
+# Menjawab Soal
 Pada saat pengguna melakukan simulasi dan menyimpan jawaban dari soal maka terlebih dahulu dicek berapa poin pertanyaan tersebut, kemudian mengecek apakah pertanyaan tersebut sudah pernah diwab sebelumnya
 
 Jika pertanyaan belum pernah dijawab maka jalankan query INSERT jika sudah ernah dijawab maka jalankan query UPDATE

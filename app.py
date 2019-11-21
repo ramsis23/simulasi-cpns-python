@@ -4,7 +4,6 @@ import pymysql
 import json
 import bcrypt
 
-
 app = Flask(__name__)
 app.secret_key = "^A%DJAJU^JJ123" #app secret untuk bcrypt, sifatnya rahasia, boleh diisi apa saja
 
@@ -191,19 +190,7 @@ def register():
             connection.commit()
             cursor.close()
 
-            # Dapatkan pengguna dari email
-            cursor = connection.cursor()
-            cursor.execute(
-                "SELECT count(email) as total FROM users WHERE email=%s", [email])
-            user = cursor.fetchone()
-            cursor.close()
-
-            session['id_user'] = user['id']
-            session['name'] = user['name']
-            session['role'] = user['role']
-            session['email'] = user['email']
-
-            return redirect(url_for('home'))
+            return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
@@ -289,16 +276,19 @@ def updatePaket():
 
 @app.route('/data-paket/delete/<string:id>')
 def deletePaket(id):
+
     cursor = connection.cursor()
     cursor.execute(
         "DELETE FROM paket WHERE id=%s", [id])
     connection.commit()
+    cursor.close()
 
+    cursor = connection.cursor()
     cursor.execute(
         "DELETE FROM soal WHERE id_paket=%s", [id])
     connection.commit()
-
     cursor.close()
+
     return redirect(url_for('dataPaket'))
 
 @app.route('/data-paket/soal/add', methods=["POST"])
@@ -322,9 +312,12 @@ def addSoal():
     insertSoal = cursor.execute(
         "INSERT INTO soal(pertanyaan_text,id_paket,id_tipe,nomor_soal) VALUES(%s,%s,%s,%s)", [pertanyaan_text, id_paket, id_tipe, nomor_soal])
     connection.commit()
+    cursor.close()
+
     id_soal = cursor.lastrowid
     print("id soal: "+str(id_soal))
     
+    cursor = connection.cursor()
     insertOpsi = cursor.execute(
         "INSERT INTO soal_opsi(opsi_text,poin,id_soal) VALUES(%s,%s,%s),(%s,%s,%s),(%s,%s,%s),(%s,%s,%s),(%s,%s,%s)", [opsi_text1, poin1, id_soal, opsi_text2, poin2, id_soal, opsi_text3, poin3, id_soal, opsi_text4, poin4, id_soal, opsi_text5, poin5, id_soal])
     connection.commit()
@@ -363,57 +356,76 @@ def updateSoal():
     insertSoal = cursor.execute(
         "UPDATE soal SET pertanyaan_text=%s, id_paket=%s, id_tipe=%s, nomor_soal=%s WHERE id=%s", [pertanyaan_text, id_paket, id_tipe, nomor_soal,id_soal])
     connection.commit()
+    cursor.close()
 
+    cursor = connection.cursor()
     updateOpsi = cursor.execute(
         "UPDATE soal_opsi SET opsi_text=%s, poin=%s, id_soal=%s WHERE id=%s", [opsi_text1, poin1, id_soal, id_opsi1])
     connection.commit()
+    cursor.close()
 
+    cursor = connection.cursor()
     updateOpsi = cursor.execute(
         "UPDATE soal_opsi SET opsi_text=%s, poin=%s, id_soal=%s WHERE id=%s", [opsi_text2, poin2, id_soal, id_opsi2])
     connection.commit()
+    cursor.close()
 
+    cursor = connection.cursor()
     updateOpsi = cursor.execute(
         "UPDATE soal_opsi SET opsi_text=%s, poin=%s, id_soal=%s WHERE id=%s", [opsi_text3, poin3, id_soal, id_opsi3])
     connection.commit()
+    cursor.close()
 
+    cursor = connection.cursor()
     updateOpsi = cursor.execute(
         "UPDATE soal_opsi SET opsi_text=%s, poin=%s, id_soal=%s WHERE id=%s", [opsi_text4, poin4, id_soal, id_opsi4])
     connection.commit()
+    cursor.close()
 
+    cursor = connection.cursor()
     updateOpsi = cursor.execute(
         "UPDATE soal_opsi SET opsi_text=%s, poin=%s, id_soal=%s WHERE id=%s", [opsi_text5, poin5, id_soal, id_opsi5])
     connection.commit()
-
     cursor.close()
+
     return redirect(url_for('detailPaket', id=id_paket))
 
 @app.route('/data-paket/soal/del/<string:idPaket>/<string:idSoal>')
 def delSoal(idPaket,idSoal):
+    print("id Paket "+idPaket+" || id soal: "+idSoal)
+    
     cursor = connection.cursor()
     delSoal = cursor.execute(
         "DELETE FROM soal WHERE id=%s", [idSoal])
     connection.commit()
+    cursor.close()
+    
+    cursor = connection.cursor()
     delOpsi = cursor.execute(
         "DELETE FROM soal_opsi WHERE id_soal=%s", [idSoal])
     connection.commit()
     cursor.close()
+
     return redirect(url_for('detailPaket', id=idPaket))
 
 @app.route('/data-paket/<string:id>')
 def detailPaket(id):
     cursor = connection.cursor()
-
-    resultTipe = cursor.execute("SELECT * FROM tipe_soal")
+    cursor.execute("SELECT * FROM tipe_soal")
     tipe = cursor.fetchall()
+    cursor.close()
 
-    resultPaket = cursor.execute("SELECT * FROM paket WHERE id="+id)
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM paket WHERE id="+id)
     paket = cursor.fetchone()
+    cursor.close()
 
-    resultSoal = cursor.execute(
+    cursor = connection.cursor()
+    cursor.execute(
         "SELECT sl.id,sl.pertanyaan_text,sl.id_paket,sl.id_tipe,sl.nomor_soal,ts.nama_tipe FROM soal as sl INNER JOIN tipe_soal as ts WHERE sl.id_tipe=ts.id AND id_paket=%s ORDER BY nomor_soal ASC", (id))
     soals = cursor.fetchall()
-
     cursor.close()
+
     total = len(soals)
     # print(json.dumps(soals))
     return render_template('paket/detail-paket.html', paket=paket, soals=soals, tipe=tipe, total=total)
