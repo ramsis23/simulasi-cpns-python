@@ -4,9 +4,9 @@ import pymysql
 import json
 import bcrypt
 
-# Jika menggunakan MySQL
+
 app = Flask(__name__)
-app.secret_key = "^A%DJAJU^JJ123"
+app.secret_key = "^A%DJAJU^JJ123" #app secret untuk bcrypt, sifatnya rahasia, boleh diisi apa saja
 
 # CORS untuk permission AJAX / API
 CORS(app)
