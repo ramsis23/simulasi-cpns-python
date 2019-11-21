@@ -169,3 +169,194 @@ def login():
         return render_template("login.html")
 ```
 
+# Register
+
+Pengguna dapat mendaftarkan diri melalu menu register kemudian mengisi biodata sesuai form tersebut
+![N|Solid](https://i.postimg.cc/kGjpxxr2/html-register.png)
+
+Lakukan pengecekan email sebelum membuat pengguna baru, jika email belum digunakan maka lakukan aksi INSERT INTO
+
+Contoh kode program:
+
+```python
+@app.route('/register', methods=["GET", "POST"])
+def register():
+    if request.method == 'GET':
+        return render_template("register.html")
+    else:
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password'].encode('utf-8')
+        hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
+
+        # Cek apakah user dengan email tersebut sudah ada
+        cursor = connection.cursor()
+        cursor.execute("SELECT count(email) as total FROM users WHERE email=%s", [email])
+        user = cursor.fetchone()
+        cursor.close()
+
+        if int(user['total']) > 0:
+            return "Gagal ditambahkan. User sudah ada"
+        else:
+
+            # Tambahkan user ke database
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO users (name, email, password, role) VALUES (%s,%s,%s,%s)",
+                        [name, email, hash_password, 'student'])
+            connection.commit()
+            cursor.close()
+
+            # Dapatkan pengguna dari email
+            cursor = connection.cursor()
+            cursor.execute(
+                "SELECT count(email) as total FROM users WHERE email=%s", [email])
+            user = cursor.fetchone()
+            cursor.close()
+
+            session['id_user'] = user['id']
+            session['name'] = user['name']
+            session['role'] = user['role']
+            session['email'] = user['email']
+
+            return redirect(url_for('home'))
+```
+
+# Menampilkan data dari database
+
+Untuk menampilkan data dari database ada 2 yaitu menampilkan seluruh data sesuai dengan query yang diberikan atau menampilkan satu data suai dengan query yang diberikan
+
+Contoh kode program untuk menampilkan seluruh data:
+```python
+cursor = connection.cursor()
+cursor.execute("SELECT * FROM tipe_soal")
+tipe = cursor.fetchall()
+cursor.close()
+```
+
+Contoh kode program untuk menampilkan seluruh data:
+```python
+cursor = connection.cursor()
+cursor.execute("SELECT * FROM tipe_soal WHERE id=1")
+tipe = cursor.fetchall()
+cursor.close()
+```
+
+# Menambahkan data berdasarkan form yang diimput
+Contoh pada form penambahan Tipe Soal hanya terdapat satu field input yaitu nama tipe soal
+
+```html
+<form method="POST" action="/data-tipe/add">
+    <div class="form-group">
+        <label for="usr">Nama Tipe Soal:</label>
+        <input type="text" class="form-control" name="nama_tipe">
+    </div>
+    <p>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+    </p>
+</form>
+```
+
+Maka dibuat route dengan tipe POST
+
+```python
+@app.route('/data-tipe/add', methods=["POST"])
+def addTipe():
+    nama_tipe = request.form['nama_tipe']
+
+    cursor = connection.cursor()
+    cursor.execute(
+        "INSERT INTO tipe_soal (nama_tipe) VALUES (%s)", [nama_tipe])
+    connection.commit()
+    cursor.close()
+    return redirect(url_for('dataTipe'))
+```
+
+connection.commit() untuk melakukan konfirmasi perubahan terhadap database baik itu INSERT, UPDATE dan DELETE
+
+# Melakukan Update Data
+Contoh route untuk mengubah nama paket soal
+
+```python
+@app.route('/data-paket/update', methods=["POST"])
+def updatePaket():
+    nama_paket = request.form['nama_paket']
+    id = request.form['id']
+    
+    cursor = connection.cursor()
+    cursor.execute(
+        "UPDATE paket SET nama_paket=%s WHERE id=%s", [nama_paket,id])
+    connection.commit()
+    cursor.close()
+    return redirect(url_for('dataPaket'))
+```
+
+# Menghapus Data
+Contoh route untuk menghapus data paket soal
+```python
+@app.route('/data-paket/delete/<string:id>')
+def deletePaket(id):
+    cursor = connection.cursor()
+    cursor.execute(
+        "DELETE FROM paket WHERE id=%s", [id])
+    connection.commit()
+
+    cursor.execute(
+        "DELETE FROM soal WHERE id_paket=%s", [id])
+    connection.commit()
+
+    cursor.close()
+    return redirect(url_for('dataPaket'))
+```
+
+Semua soal yang masuk dalam kategori paket tersebut juga akan dihapus
+
+# Menajawab Soal
+Pada saat pengguna melakukan simulasi dan menyimpan jawaban dari soal maka terlebih dahulu dicek berapa poin pertanyaan tersebut, kemudian mengecek apakah pertanyaan tersebut sudah pernah diwab sebelumnya
+
+Jika pertanyaan belum pernah dijawab maka jalankan query INSERT jika sudah ernah dijawab maka jalankan query UPDATE
+
+```python
+cursor = connection.cursor()
+
+cursor.execute(
+    "SELECT * FROM soal_opsi WHERE id=%s", [id_opsi_jawab])
+opsi = cursor.fetchone()
+poin = opsi['poin']
+
+cursor.execute(
+    "SELECT * FROM jawaban_riwayat_simulasi WHERE id_riwayat=%s AND id_soal=%s", [id_riwayat, id_soal])
+cek_jawaban = cursor.fetchone()
+
+if cek_jawaban :
+    cursor.execute(
+        "UPDATE jawaban_riwayat_simulasi SET poin=%s, id_opsi_jawab=%s WHERE id=%s", [poin, id_opsi_jawab, cek_jawaban['id']])
+    connection.commit()
+    cursor.close()
+else:
+    cursor.execute(
+        "INSERT INTO jawaban_riwayat_simulasi (id_user,id_riwayat,id_simulasi_paket,id_tipe,id_soal,id_opsi_jawab,poin) VALUES ( %s, %s, %s, %s, %s, %s, %s)", [id_user, id_riwayat, id_simulasi_paket, id_tipe, id_soal, id_opsi_jawab, poin])
+    connection.commit()
+    cursor.close()
+```
+
+# Selesai Simulasi
+Setelah selesai simulasi maka dihitung berapa total poin yang berhasil didapatkan dan berapa poin setiap tipe soal
+
+```python
+@app.route('/student/selesai-simulasi/<string:idRiwayat>')
+def selesaiSimulasi(idRiwayat):
+    nilai = 0
+
+    cursor = connection.cursor()
+    cursor.execute(
+        "SELECT SUM(poin) as total_nilai FROM jawaban_riwayat_simulasi WHERE id_riwayat=%s", [idRiwayat])
+    cek_nilai = cursor.fetchone()
+    nilai = int(cek_nilai['total_nilai'])
+
+    cursor.execute(
+        "UPDATE riwayat_simulasi SET nilai=%s WHERE id=%s", [nilai, idRiwayat])
+    connection.commit()
+
+    cursor.close()
+    return redirect(url_for('hasilSimulasi', idRiwayat=idRiwayat))
+```
