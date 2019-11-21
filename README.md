@@ -241,6 +241,26 @@ tipe = cursor.fetchone()
 cursor.close()
 ```
 
+Jika menggunakan fetchall() maka data akan dilooping satu per satu menggunakan for
+```html
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>ID</td>
+            <td>Nama Tipe Soal</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in tipe %}
+        <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.nama_tipe }}</td>
+        </tr>
+        {% endfor %}
+    <tbody>
+</table>
+```
+
 # Menambahkan data berdasarkan form yang diimput
 Contoh pada form penambahan Tipe Soal hanya terdapat satu field input yaitu nama tipe soal
 
