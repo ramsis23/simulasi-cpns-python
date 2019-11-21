@@ -237,7 +237,7 @@ Contoh kode program untuk menampilkan seluruh data:
 ```python
 cursor = connection.cursor()
 cursor.execute("SELECT * FROM tipe_soal WHERE id=1")
-tipe = cursor.fetchall()
+tipe = cursor.fetchone()
 cursor.close()
 ```
 
