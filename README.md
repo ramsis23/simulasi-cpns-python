@@ -375,6 +375,7 @@ else:
     connection.commit()
     cursor.close()
 ```
+![N|Solid](https://i.postimg.cc/zDCkxjTm/jawab-soal.png)
 
 # Selesai Simulasi
 Setelah selesai simulasi maka dihitung berapa total poin yang berhasil didapatkan dan berapa poin setiap tipe soal
@@ -397,3 +398,5 @@ def selesaiSimulasi(idRiwayat):
     cursor.close()
     return redirect(url_for('hasilSimulasi', idRiwayat=idRiwayat))
 ```
+
+![N|Solid](https://i.postimg.cc/y8YngZJM/hasil-simulasi.png)

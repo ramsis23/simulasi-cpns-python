@@ -190,7 +190,19 @@ def register():
             connection.commit()
             cursor.close()
 
-            return redirect(url_for('login'))
+            # Dapatkan pengguna dari email
+            cursor = connection.cursor()
+            cursor.execute(
+                "SELECT * FROM users WHERE email=%s", [email])
+            user = cursor.fetchone()
+            cursor.close()
+
+            session['id_user'] = user['id']
+            session['name'] = user['name']
+            session['role'] = user['role']
+            session['email'] = user['email']
+
+            return redirect(url_for('home'))
 
 @app.route('/logout')
 def logout():
@@ -433,7 +445,7 @@ def detailPaket(id):
 @app.route('/ajax/soal/opsi/<string:id>')
 def ajaxSoalOpsi(id):
     cursor = connection.cursor()
-    result = cursor.execute(
+    cursor.execute(
         "SELECT * FROM soal_opsi WHERE id_soal=%s",[id])
     opsi = cursor.fetchall()
     cursor.close()
@@ -442,7 +454,7 @@ def ajaxSoalOpsi(id):
 @app.route('/ajax/paket/search/<string:keyword>')
 def ajaxPaketSearch(keyword):
     cursor = connection.cursor()
-    result = cursor.execute(
+    cursor.execute(
         "SELECT * FROM paket WHERE nama_paket LIKE '%"+keyword+"%'")
     simulasis = cursor.fetchall()
     cursor.close()
@@ -456,7 +468,7 @@ def ajaxPaketAddToSimulasi():
     print("Id Simulasi : ",id_simulasi)
     
     cursor = connection.cursor()
-    cek = cursor.execute(
+    cursor.execute(
         "SELECT * FROM simulasi_paket WHERE id_simulasi=%s AND id_paket=%s", (id_simulasi, id_paket,))
     resultCek = cursor.fetchone()
     print(json.dumps(resultCek))
